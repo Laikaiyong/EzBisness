@@ -173,7 +173,7 @@ function genAiSummary(prompt) {
 
   var geminiKey = PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY");
   var apiEndpoint =
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key='
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='
     + geminiKey;
 
   var nlOptions = {
