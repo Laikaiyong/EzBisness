@@ -7,7 +7,46 @@
 * and not all of the user's files. The authorization request message
 * presented to users will reflect this limited scope.
 */
-function onOpen() {
+async function getNotionPageProperties() {
+  const notionApiKey = PropertiesService.getScriptProperties().getProperty("NOTION_API_KEY");
+  const databaseId = PropertiesService.getScriptProperties().getProperty("NOTION_DATABASE_ID");
+  
+  const url = `https://api.notion.com/v1/databases/${databaseId}/query`;
+  
+  const options = {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${notionApiKey}`,
+      'Notion-Version': '2022-06-28',
+      'Content-Type': 'application/json'
+    },
+    muteHttpExceptions: true
+  };
+  
+  try {
+    const response = await UrlFetchApp.fetch(url, options);
+    const pageData = JSON.parse(response.getContentText());
+    
+    // const imageUrl = pageData.properties.Image.files[0].external.url;
+    // const tagText = pageData.properties.Tag.rich_text[0].plain_text;
+    
+    // Logger.log('Image URL: ' + imageUrl);
+    // Logger.log('Tag: ' + tagText);
+    
+    // return {
+    //   imageUrl: imageUrl,
+    //   tag: tagText
+    // };
+    Logger.log(pageData);
+    return pageData;
+  } catch (error) {
+    Logger.log('Error: ' + error);
+    return null;
+  }
+}
+
+async function onOpen() {
+  var titles = await getNotionPageProperties();
   var ui = SlidesApp.getUi();
   ui.createMenu('Trademark')
     .addItem('Company logo', 'mergeLogo')
@@ -17,11 +56,12 @@ function onOpen() {
 }
 
 
-function mergeLogo() {
+async function mergeLogo() {
   var templateId = SlidesApp.getActivePresentation().getId();
+  var data = await getNotionPageProperties();
 
   //Logo url
-  var logoUrl = "https://lh3.googleusercontent.com/fife/ALs6j_GrsxxIR8u6QYPzCvIO1cYgL31T28t8o-5s0G1ecHIj1l6q4Gaux4blUIXWYG-pm4XT1aQ2ohN1TPz-TdCh-cY7ry2gM-6h8dQQ3rYjJ_AvRpT1IMBwgRQUDPXXFaTQcgAV7Inl9PINeD-RVkzsp3NZWZicei_rHdgTmRzRtZg0C9_amZ6nEWuF7EUV3GxbYlHirtgTdCL4un7IK3dlMGJVoXehHLHamkZl-MB2DYS5AKhQkwphzpAyRx-T7xv15GPs8cH3YDCkcrohboFGwUsSudxiJ8vkwG4x68kEx7w0T_fWVs5hVJyIyaicPOOrdb8B_6-jV1C2Nxv35MrI6XaX9dngmvwc_PGIGeNZvZiIgKXTSVr2wXoo3418hQxogCiIBjwqSH7-o8R_Cnz-Gp6pkoloVq8IquLm60PcYw5duJ1IfEAcCcSJSHDY0zhbhgIvT4bIZorxnXIotwabwG36-VfsSnRU9beg21Jp7F2_S72xQrFzUEFv-GCQ1QD2KVl1UYC9IjDBSRYc3Z7tOEenrvn1LQsImqYRplDGpW4pCNcpaTdhi3kBLwiFyLpxKBEYy1BI6NJZ80NTyxtiRI4WXgtb7nLicz-GJXD4lfY856eb_6RRAzYQjS6FAEAgwJQ6luqli1QOjUPsBUK7rbnNZ3wCpXsrKzbf0IlSK8OnKCefv4zyZ_Cr3Ajw8ZjgCQQ5soZKBR8Zu6v9BTGiJAR_sFfUd3hM3QwGcLUE83Z-uAqn0Qtlx-j3TdCDnCM62il7XQ5Yvq-dfpuwp6C0aliWtC3iKG9FAcxHq_wrQ4ls2lZDz_ntqN5oGkkCM_j5TjZKYFy_cos1XtHGK8Lqn3076O-0_2i3VH68ClAVMnp3l6KWY15PSslNNR6HaxgnA-AjY9Gi9rdb34ME5VWQJg2A4do-j4QIJ8lAb5eWw-Ya-I5OoOmPX8aMrqE9vahh-mYcorl4iLwJY2B4s63tIacUoEhEVviytx1ASUgL9n6tCUtrCOJ9QR18cXCJXerzDeykT34ZugR5H0aY1k7QF2GtK0aCSiqgpB7YsAlsjK2RBdBuQrQroNN-243d8fJbkHRezxws54Jt0NbXbQf56Jdn7Xp5xwW8uDVUhCMvcy5EcnF258nEggjEpDrLBezw__7-y0fd51aOwptWZ4hWRXN3JAHzASb7zL_bekoPe9WZ8NaZL49V_e_MYRAGWWMbiPXfoh4XIUJy3jBfjVcvVetUCodVP49MGafKGfmnxd4TbhiPL7oOvQcZtlC08sxO-BV-57-jxnrwVz8fLvPQrCOnzCYoyQqKj0PeG0S7JDcC0uN8V_u0OPfDMlOmIMZ_eTX6Z3taVX2YbvutXIOVSrUT-GIEnuRMVj3X2GnOxlrqGoXVjgZyBGiCL5XUnSqFW89esMWkCMYffO6cVZqrzLmJXjrT3TBuO_g3GwMqy_cFt2VIMPhoAVqwAii4YHmMzrC1YtnEteJPC-wP4x-uqkS8N05tWlTzo8KlJAttQTHHPC0RBLWQr5uD2NkVqL0lhgBT-0MsJJooSbd_Wp4QCOSz-D450LgSeA9QTi2RFIJQmfxFRqaFXItSEo2KF4_yjAtgYlBgtUjRyU_1Nfg=s320-w320-h200-p-k";
+  var logoUrl = data.results[1].properties.Image.files[0].file.url;
 
  // Create the request to replace shapes in the
  // presentation with the logo. Any shape with the text
@@ -30,7 +70,7 @@ function mergeLogo() {
    replaceAllShapesWithImage: {
      imageUrl: logoUrl,
      containsText: {
-       text: '{{logo_image}}'
+       text: data.results[1].properties.Tag.rich_text[0].text.content,
      }
    }
  }];
@@ -41,11 +81,12 @@ function mergeLogo() {
  }, templateId);
 }
 
-function mergeLazadaLogo() {
+async function mergeLazadaLogo() {
   var templateId = SlidesApp.getActivePresentation().getId();
+  var data = await getNotionPageProperties();
 
   //Logo url
-  var logoUrl = "https://seeklogo.com/images/L/lazada-logo-B0415CCF29-seeklogo.com.png";
+  var logoUrl = data.results[2].properties.Image.files[0].file.url;
 
  // Create the request to replace shapes in the
  // presentation with the logo. Any shape with the text
@@ -54,7 +95,7 @@ function mergeLazadaLogo() {
    replaceAllShapesWithImage: {
      imageUrl: logoUrl,
      containsText: {
-       text: '{{lazada_logo}}'
+       text: data.results[2].properties.Tag.rich_text[0].text.content,
      }
    }
  }];
@@ -65,11 +106,12 @@ function mergeLazadaLogo() {
  }, templateId);
 }
 
-function mergeShopeeLogo() {
+async function mergeShopeeLogo() {
   var templateId = SlidesApp.getActivePresentation().getId();
+  var data = await getNotionPageProperties();
 
   //Logo url
-  var logoUrl = "https://1000logos.net/wp-content/uploads/2021/02/Shopee-logo.png";
+  var logoUrl = data.results[0].properties.Image.files[0].file.url;
 
  // Create the request to replace shapes in the
  // presentation with the logo. Any shape with the text
@@ -78,7 +120,7 @@ function mergeShopeeLogo() {
    replaceAllShapesWithImage: {
      imageUrl: logoUrl,
      containsText: {
-       text: '{{shopee_logo}}'
+       text: data.results[0].properties.Tag.rich_text[0].text.content,
      }
    }
  }];

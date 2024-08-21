@@ -23,8 +23,8 @@ async function onFormSubmit(e) {
   var name = itemResponses[GULU_NAME][0];
   var deliveryAddress = itemResponses[GULU_DELIVERY_ADD][0];
   var phone = itemResponses[GULU_PHONE][0];
-  var orderItemName = (itemResponses[GULU_CHOCOLATE_CHIP][0] != "") ? "Chocolate Chip" : (itemResponses[GULU_MARSHMALLOW][0] != "") ? "Marshmallow" : "Chocolate Brownie";
-  var orderItemQuantity = (itemResponses[GULU_CHOCOLATE_CHIP][0] != "") ? itemResponses[GULU_CHOCOLATE_CHIP][0] : (itemResponses[GULU_MARSHMALLOW][0] != "") ? itemResponses[GULU_MARSHMALLOW][0] : itemResponses[GULU_CHOCOLATE_BROWNIES][0];
+  var orderItemName = (itemResponses[GULU_CHOCOLATE_CHIP][0] != 0) ? "Chocolate Chip" : (itemResponses[GULU_MARSHMALLOW][0] != 0) ? "Marshmallow" : "Chocolate Brownie";
+  var orderItemQuantity = (itemResponses[GULU_CHOCOLATE_CHIP][0] != 0) ? itemResponses[GULU_CHOCOLATE_CHIP][0] : (itemResponses[GULU_MARSHMALLOW][0] != 0) ? itemResponses[GULU_MARSHMALLOW][0] : itemResponses[GULU_CHOCOLATE_BROWNIES][0];
   var timestamp = itemResponses[GULU_TIMESTAMP][0];
 
   var d = new Date();
@@ -59,7 +59,7 @@ async function onFormSubmit(e) {
 
 async function postToNotion(orderId, timestamp, email, name, deliveryAddress, phone, orderItemName, orderItemQuantity) {
   var notionToken = PropertiesService.getScriptProperties().getProperty("NOTION_API_KEY"); 
-  var notionDatabaseId = "67a79c26d7d54b0aa45fb26ef597375d"; 
+  var notionDatabaseId = PropertiesService.getScriptProperties().getProperty("NOTION_DB_ID"); 
 
   Logger.log("in postToNotion");
 
@@ -105,13 +105,9 @@ async function postToNotion(orderId, timestamp, email, name, deliveryAddress, ph
         phone_number: phone
       },
       'Item Name': {
-        rich_text: [
-          {
-            text: {
-              content: orderItemName
-            }
-          }
-        ]
+        select: {
+          name: orderItemName
+        }
       },
       'Quantity': {
         number: parseInt(orderItemQuantity)
@@ -120,6 +116,7 @@ async function postToNotion(orderId, timestamp, email, name, deliveryAddress, ph
   };
 
   var options = {
+    muteHttpExceptions: true,
     method: 'post',
     contentType: 'application/json',
     headers: {

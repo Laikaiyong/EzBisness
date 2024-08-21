@@ -4,6 +4,12 @@ function launchCampaign() {
   var values = range.getValues();
   Logger.log(values);
 
+  var confirm = Browser.msgBox(
+    'Are you sure you want to launch the campaign ?',
+    Browser.Buttons.YES_NO
+  ); 
+  if(confirm!='yes'){return};
+
   var event = CalendarApp.getDefaultCalendar().createEvent(values[0][0],
     new Date(values[0][2]),
     new Date(values[0][3]),

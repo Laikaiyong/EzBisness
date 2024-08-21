@@ -73,7 +73,7 @@ function convertTimestamp(timestamp) {
 
 function postFeedbackToNotion(timestamp, feedbackType, feedback, suggestions, experience, name, email, mediaLink) {
   var notionToken = PropertiesService.getScriptProperties().getProperty("NOTION_API_KEY");
-  var notionDatabaseId = 'f35abdce397d4c4fa63035ac8277a399';
+  var notionDatabaseId = PropertiesService.getScriptProperties().getProperty("NOTION_DB_ID");
 
   var payload = {
     parent: { database_id: notionDatabaseId },
